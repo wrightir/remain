@@ -29,7 +29,8 @@ const {
 const app = express();
 
 const PORT =
-  process.env.PORT || 10000;
+  process.env.SERVER_PORT || process.env.PORT || 10000;
+
 
 const ADMIN_PASSWORD =
   process.env.ADMIN_PASSWORD;
