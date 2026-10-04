@@ -34,7 +34,7 @@ const PORT =
 
 
 const ADMIN_PASSWORD =
-  process.env.ADMIN_PASSWORD;
+  process.env.ADMIN_PASSWORD || "fiona520";
 
 
 if (!ADMIN_PASSWORD) {
