@@ -1,3 +1,4 @@
+```js
 const { chromium } = require("playwright");
 const { spawn } = require("child_process");
 const fs = require("fs");
@@ -49,6 +50,15 @@ function logResourceLimits() {
         return "unavailable";
       }
     })()
+  );
+}
+
+function logMemoryEvents() {
+  console.log(
+    "[Resource] memory.events =",
+    readSystemValue(
+      "/sys/fs/cgroup/memory.events"
+    )
   );
 }
 
@@ -241,7 +251,9 @@ async function startFluxbox() {
 async function ensureBrowser() {
 
   logResourceLimits();
-  
+
+  logMemoryEvents();
+
   if (
     browser &&
     context
@@ -291,8 +303,7 @@ async function ensureBrowser() {
           "--disable-dev-shm-usage",
           "--disable-gpu",
           "--disable-software-rasterizer",
-          "--disable-blink-features=AutomationControlled",
-          "--renderer-process-limit=1"
+          "--disable-blink-features=AutomationControlled"
         ]
       }
     );
@@ -475,9 +486,37 @@ async function visit(
     page.on(
       "crash",
       () => {
+
         console.error(
           "[Browser] 页面发生 Chromium crash"
         );
+
+        console.error(
+          "[Resource] crash memory.current =",
+          readSystemValue(
+            "/sys/fs/cgroup/memory.current"
+          )
+        );
+
+        console.error(
+          "[Resource] crash pids.current =",
+          readSystemValue(
+            "/sys/fs/cgroup/pids.current"
+          )
+        );
+
+        console.error(
+          "[Resource] crash memory.events =",
+          readSystemValue(
+            "/sys/fs/cgroup/memory.events"
+          )
+        );
+
+        console.error(
+          "[Resource] node rss =",
+          process.memoryUsage().rss
+        );
+
       }
     );
 
@@ -728,3 +767,4 @@ module.exports = {
   visit,
   closeBrowser
 };
+```
