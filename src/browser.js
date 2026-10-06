@@ -285,27 +285,24 @@ async function ensureBrowser() {
     "[Browser] 启动 Chromium"
   );
 
-  context =
-    await chromium.launchPersistentContext(
-      userDataDir,
-      {
-        headless: false,
-
-        viewport: {
-          width: 1920,
-          height: 1080
-        },
-
-        args: [
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-          "--disable-dev-shm-usage",
-          "--disable-gpu",
-          "--disable-software-rasterizer",
-          "--disable-blink-features=AutomationControlled"
-        ]
-      }
-    );
+ context = await chromium.launchPersistentContext(
+  userDataDir,
+  {
+    headless: false,
+    dumpio: true,
+    viewport: { width: 1920, height: 1080 },
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-gpu",
+      "--disable-software-rasterizer",
+      "--disable-blink-features=AutomationControlled",
+      "--enable-logging=stderr",
+      "--v=1"
+    ]
+  }
+);
 
   browser = context;
 
