@@ -239,7 +239,8 @@ async function ensureBrowser() {
           "--disable-dev-shm-usage",
           "--disable-gpu",
           "--disable-software-rasterizer",
-          "--disable-blink-features=AutomationControlled"
+          "--disable-blink-features=AutomationControlled",
+          "--renderer-process-limit=1"
         ]
       }
     );
@@ -417,6 +418,16 @@ async function visit(
 
     page =
       await context.newPage();
+
+
+    page.on(
+      "crash",
+      () => {
+        console.error(
+          "[Browser] 页面发生 Chromium crash"
+        );
+      }
+    );
 
 
     /*
