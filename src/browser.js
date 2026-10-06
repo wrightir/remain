@@ -1,4 +1,3 @@
-```js
 const { chromium } = require("playwright");
 const { spawn } = require("child_process");
 const fs = require("fs");
@@ -767,4 +766,4 @@ module.exports = {
   visit,
   closeBrowser
 };
-```
+
