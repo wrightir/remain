@@ -2,6 +2,56 @@ const { chromium } = require("playwright");
 const { spawn } = require("child_process");
 const fs = require("fs");
 
+function readSystemValue(path) {
+  try {
+    return fs.readFileSync(path, "utf8").trim();
+  } catch {
+    return "unavailable";
+  }
+}
+
+function logResourceLimits() {
+  console.log(
+    "[Resource] memory.max =",
+    readSystemValue("/sys/fs/cgroup/memory.max")
+  );
+
+  console.log(
+    "[Resource] memory.current =",
+    readSystemValue("/sys/fs/cgroup/memory.current")
+  );
+
+  console.log(
+    "[Resource] pids.max =",
+    readSystemValue("/sys/fs/cgroup/pids.max")
+  );
+
+  console.log(
+    "[Resource] pids.current =",
+    readSystemValue("/sys/fs/cgroup/pids.current")
+  );
+
+  console.log(
+    "[Resource] cpu.max =",
+    readSystemValue("/sys/fs/cgroup/cpu.max")
+  );
+
+  console.log(
+    "[Resource] ulimit-n =",
+    (() => {
+      try {
+        return require("child_process")
+          .execFileSync("sh", ["-c", "ulimit -n"], {
+            encoding: "utf8"
+          })
+          .trim();
+      } catch {
+        return "unavailable";
+      }
+    })()
+  );
+}
+
 const { addLog } = require("./logger");
 
 let browser = null;
@@ -190,6 +240,8 @@ async function startFluxbox() {
 
 async function ensureBrowser() {
 
+  logResourceLimits();
+  
   if (
     browser &&
     context
