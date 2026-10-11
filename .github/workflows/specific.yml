@@ -11,7 +11,8 @@ on:
         options:
           - check
           - create-project
-        default: check
+          - deploy
+        default: deploy
 
 permissions:
   contents: read
@@ -39,3 +40,9 @@ jobs:
         env:
           SPECIFIC_API_KEY: ${{ secrets.SPECIFIC_API_KEY }}
         run: specific project new remain-test
+
+      - name: Deploy Remain
+        if: inputs.action == 'deploy'
+        env:
+          SPECIFIC_API_KEY: ${{ secrets.SPECIFIC_API_KEY }}
+        run: specific deploy --project proj_0kz0qjpkzth75b1f
