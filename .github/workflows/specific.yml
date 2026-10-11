@@ -45,4 +45,7 @@ jobs:
         if: inputs.action == 'deploy'
         env:
           SPECIFIC_API_KEY: ${{ secrets.SPECIFIC_API_KEY }}
-        run: specific deploy --project proj_0kz0qjpkzth75b1f
+        run: |
+          specific deploy \
+            --project proj_0kz0qjpkzth75b1f \
+            --secret admin_password="${{ secrets.ADMIN_PASSWORD }}"
