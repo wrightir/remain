@@ -1,0 +1,41 @@
+
+name: Specific Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Choose an action"
+        required: true
+        type: choice
+        options:
+          - check
+          - create-project
+        default: check
+
+permissions:
+  contents: read
+
+jobs:
+  specific:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Specific CLI
+        run: |
+          curl -fsSL https://specific.dev/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+
+      - name: Check configuration
+        if: inputs.action == 'check'
+        run: specific check
+
+      - name: Create Specific project
+        if: inputs.action == 'create-project'
+        env:
+          SPECIFIC_API_KEY: ${{ secrets.SPECIFIC_API_KEY }}
+        run: specific project new remain-test
