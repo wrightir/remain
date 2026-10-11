@@ -48,4 +48,6 @@ jobs:
         run: |
           specific deploy \
             --project proj_0kz0qjpkzth75b1f \
-            --secret admin_password="${{ secrets.ADMIN_PASSWORD }}"
+            --secret admin_password="${{ secrets.ADMIN_PASSWORD }}" \
+            --secret rclone_conf="${{ secrets.RCLONE_CONF }}" \
+            --secret remote_folder="${{ secrets.REMOTE_FOLDER }}"
