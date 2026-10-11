@@ -2,65 +2,6 @@ const { chromium } = require("playwright");
 const { spawn } = require("child_process");
 const fs = require("fs");
 
-function readSystemValue(path) {
-  try {
-    return fs.readFileSync(path, "utf8").trim();
-  } catch {
-    return "unavailable";
-  }
-}
-
-function logResourceLimits() {
-  console.log(
-    "[Resource] memory.max =",
-    readSystemValue("/sys/fs/cgroup/memory.max")
-  );
-
-  console.log(
-    "[Resource] memory.current =",
-    readSystemValue("/sys/fs/cgroup/memory.current")
-  );
-
-  console.log(
-    "[Resource] pids.max =",
-    readSystemValue("/sys/fs/cgroup/pids.max")
-  );
-
-  console.log(
-    "[Resource] pids.current =",
-    readSystemValue("/sys/fs/cgroup/pids.current")
-  );
-
-  console.log(
-    "[Resource] cpu.max =",
-    readSystemValue("/sys/fs/cgroup/cpu.max")
-  );
-
-  console.log(
-    "[Resource] ulimit-n =",
-    (() => {
-      try {
-        return require("child_process")
-          .execFileSync("sh", ["-c", "ulimit -n"], {
-            encoding: "utf8"
-          })
-          .trim();
-      } catch {
-        return "unavailable";
-      }
-    })()
-  );
-}
-
-function logMemoryEvents() {
-  console.log(
-    "[Resource] memory.events =",
-    readSystemValue(
-      "/sys/fs/cgroup/memory.events"
-    )
-  );
-}
-
 const { addLog } = require("./logger");
 
 let browser = null;
@@ -249,10 +190,6 @@ async function startFluxbox() {
 
 async function ensureBrowser() {
 
-  logResourceLimits();
-
-  logMemoryEvents();
-
   if (
     browser &&
     context
@@ -285,24 +222,27 @@ async function ensureBrowser() {
     "[Browser] 启动 Chromium"
   );
 
- context = await chromium.launchPersistentContext(
-  userDataDir,
-  {
-    headless: false,
-    dumpio: true,
-    viewport: { width: 1920, height: 1080 },
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
-      "--disable-software-rasterizer",
-      "--disable-blink-features=AutomationControlled",
-      "--enable-logging=stderr",
-      "--v=1"
-    ]
-  }
-);
+  context =
+    await chromium.launchPersistentContext(
+      userDataDir,
+      {
+        headless: false,
+
+        viewport: {
+          width: 1920,
+          height: 1080
+        },
+
+        args: [
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+          "--disable-dev-shm-usage",
+          "--disable-gpu",
+          "--disable-software-rasterizer",
+          "--disable-blink-features=AutomationControlled"
+        ]
+      }
+    );
 
   browser = context;
 
@@ -477,44 +417,6 @@ async function visit(
 
     page =
       await context.newPage();
-
-
-    page.on(
-      "crash",
-      () => {
-
-        console.error(
-          "[Browser] 页面发生 Chromium crash"
-        );
-
-        console.error(
-          "[Resource] crash memory.current =",
-          readSystemValue(
-            "/sys/fs/cgroup/memory.current"
-          )
-        );
-
-        console.error(
-          "[Resource] crash pids.current =",
-          readSystemValue(
-            "/sys/fs/cgroup/pids.current"
-          )
-        );
-
-        console.error(
-          "[Resource] crash memory.events =",
-          readSystemValue(
-            "/sys/fs/cgroup/memory.events"
-          )
-        );
-
-        console.error(
-          "[Resource] node rss =",
-          process.memoryUsage().rss
-        );
-
-      }
-    );
 
 
     /*
@@ -763,4 +665,3 @@ module.exports = {
   visit,
   closeBrowser
 };
-
