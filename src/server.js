@@ -1,68 +1,5 @@
-require("dotenv").config();
 const express = require("express");
 const path = require("path");
-const fs = require("fs");
-
-/*
- * =========================================================
- * Belmo + Playwright Runtime
- * =========================================================
- *
- * 必须在加载 scheduler.js / browser.js 之前设置。
- *
- * PLAYWRIGHT_BROWSERS_PATH=0
- * 让 Playwright 使用：
- *
- * /app/node_modules/playwright-core/.local-browsers/
- *
- * 而不是：
- *
- * /root/.cache/ms-playwright/
- *
- * Chromium 的配置 / 缓存 / crashpad
- * 全部放到 /tmp，避免容器运行时目录问题。
- * =========================================================
- */
-
-process.env.PLAYWRIGHT_BROWSERS_PATH = "0";
-
-process.env.XDG_CONFIG_HOME =
-  "/tmp/.chromium-config";
-
-process.env.XDG_CACHE_HOME =
-  "/tmp/.chromium-cache";
-
-process.env.BREAKPAD_DUMP_LOCATION =
-  "/tmp/.chromium-crashpad";
-
-
-fs.mkdirSync(
-  process.env.XDG_CONFIG_HOME,
-  {
-    recursive: true
-  }
-);
-
-fs.mkdirSync(
-  process.env.XDG_CACHE_HOME,
-  {
-    recursive: true
-  }
-);
-
-fs.mkdirSync(
-  process.env.BREAKPAD_DUMP_LOCATION,
-  {
-    recursive: true
-  }
-);
-
-
-/*
- * =========================================================
- * Database
- * =========================================================
- */
 
 const {
   getTasks,
@@ -73,37 +10,16 @@ const {
   getDatabaseSyncStatus
 } = require("./database");
 
-
-/*
- * =========================================================
- * Logger
- * =========================================================
- */
-
 const {
   getLogs,
   addLog,
   subscribe
 } = require("./logger");
 
-
-/*
- * =========================================================
- * Scheduler
- * =========================================================
- */
-
 const {
   startScheduler,
   stopScheduler
 } = require("./scheduler");
-
-
-/*
- * =========================================================
- * Browser
- * =========================================================
- */
 
 const {
   closeBrowser
@@ -112,16 +28,11 @@ const {
 
 const app = express();
 
-
 const PORT =
-  process.env.SERVER_PORT ||
-  process.env.PORT ||
-  10000;
-
+  process.env.PORT || 10000;
 
 const ADMIN_PASSWORD =
-  process.env.ADMIN_PASSWORD ||
-  "fiona0";
+  process.env.ADMIN_PASSWORD;
 
 
 if (!ADMIN_PASSWORD) {
@@ -608,20 +519,12 @@ app.post(
       }
 
 
-      /*
-       * 注意：
-       * createTask() 当前 database.js
-       * 使用对象参数。
-       */
-
       const task =
         createTask({
           name,
           url,
-          interval_minutes:
-            intervalMinutes,
-          stay_seconds:
-            staySeconds,
+          interval_minutes: intervalMinutes,
+          stay_seconds: staySeconds,
           enabled: 1
         });
 
