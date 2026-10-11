@@ -4,8 +4,10 @@ build "remain" {
   context    = "."
 }
 
+
 service "web" {
-  build = build.remain
+  build   = build.remain
+  command = "npm start"
 
   endpoint {
     public = true
