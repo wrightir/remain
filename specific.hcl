@@ -1,9 +1,9 @@
+secret "admin_password" {}
 
 build "remain" {
   dockerfile = "Dockerfile"
   context    = "."
 }
-
 
 service "web" {
   build   = build.remain
@@ -14,6 +14,7 @@ service "web" {
   }
 
   env = {
-    PORT = port
+    PORT           = port
+    ADMIN_PASSWORD = secret.admin_password
   }
 }
